@@ -18,7 +18,6 @@ html, body {
     overflow: hidden;
 }
 
-/* VIDEO DE FOND */
 #bgVideo {
     position: fixed;
     top: 50%;
@@ -32,7 +31,6 @@ html, body {
     object-fit: cover;
 }
 
-/* OVERLAY SANS BLUR */
 .overlay {
     position: fixed;
     inset: 0;
@@ -42,14 +40,12 @@ html, body {
     align-items: center;
 }
 
-/* CARD */
 .card {
     text-align: center;
     color: white;
     animation: fadeIn 2s ease;
 }
 
-/* AVATAR */
 .avatar {
     width: 120px;
     height: 120px;
@@ -59,176 +55,96 @@ html, body {
     margin-bottom: 15px;
 }
 
-/* TEXT */
-h1 {
-    margin: 0;
-    font-size: 36px;
-    letter-spacing: 2px;
+h1 { margin: 0; font-size: 36px; letter-spacing: 2px; }
+.quote { margin-top: 8px; font-size: 14px; opacity: 0.7; }
+.location { margin-top: 8px; font-size: 13px; opacity: 0.5; }
+.icons { margin-top: 18px; display: flex; justify-content: center; gap: 18px; }
+.icons a { color: white; font-size: 22px; opacity: 0.8; transition: 0.3s; }
+.icons a:hover { opacity: 1; transform: scale(1.1); }
+
+#compteurContainer {
+    margin-top:8px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    justify-content:center;
+    color:white;
+    font-size:18px;
 }
 
-.quote {
-    margin-top: 8px;
-    font-size: 14px;
-    opacity: 0.7;
-}
-
-.location {
-    margin-top: 8px;
-    font-size: 13px;
-    opacity: 0.5;
-}
-
-/* ICONS */
-.icons {
-    margin-top: 18px;
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-}
-
-.icons a {
-    color: white;
-    font-size: 22px;
-    opacity: 0.8;
-    transition: 0.3s;
-}
-
-.icons a:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-/* ANIM */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 </style>
 
-<!-- ICONS -->
 <script src="https://kit.fontawesome.com/7b2c1d4c8f.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
-
 </head>
 <body>
 
-<!-- VIDEO DE FOND (SON NON MUTE) -->
 <video autoplay loop id="bgVideo">
     <source src="./video.mp4" type="video/mp4">
-    Votre navigateur ne supporte pas la vidéo.
 </video>
 
 <div class="overlay">
     <div class="card">
-
         <img src="./avatar.jpeg" class="avatar" alt="avatar">
-
         <h1>Dream Lover</h1>
+        <div class="quote">Let others criticize you, but don’t do it for them.</div>
+        <div class="location">📍 France</div>
 
-        <div class="quote">
-            Let others criticize you, but don’t do it for them.
+        <!-- Compteur global sous la localisation -->
+        <div id="compteurContainer">
+            <img src="./eye.jpeg" alt="oeil" style="width:20px; height:20px;">
+            <span id="compteur">0</span>
         </div>
-
-        <div class="location">
-            📍 France
-        </div>
-        <!-- Compteur de visites avec image sous la localisation -->
-<div id="visites" style="margin-top:8px; display:flex; align-items:center; gap:5px; justify-content:center; color:white; font-size:18px;">
-    <img src="./eye.jpeg" alt="oeil" style="width:20px; height:20px;">
-    <span id="compteur">0</span>
-</div>
 
         <div class="icons">
             <a href="#" target="_blank"><i class="fab fa-snapchat-ghost"></i></a>
             <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
             <a href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
         </div>
-
     </div>
 </div>
 
-<!-- JS pour lancer le son au clic -->
 <script>
-document.addEventListener('click', () => {
-    const video = document.getElementById('bgVideo');
-    video.play();
-}, { once: true });
-</script>
+// Lecture de la vidéo au clic (pour son)
+document.addEventListener('click', () => { document.getElementById('bgVideo').play(); }, { once: true });
 
-<!-- JS pour titre qui s'écrit en boucle dans l'onglet -->
-<script>
-const titre = "@Dream Lover"; // texte à afficher
-let index = 0;
-let sens = 1; // 1 = écrire, -1 = effacer
-
+// Titre animé
+const titre = "@Dream Lover";
+let index = 0, sens = 1;
 function ecrireTitre() {
-    document.title = titre.slice(0, index);
-
-    // Si on écrit, on augmente l'index
-    if (sens === 1) {
-        index++;
-        if (index > titre.length) {
-            sens = -1; // commencer à effacer
-            setTimeout(ecrireTitre, 1000); // pause 1s à la fin
-            return;
-        }
-    } 
-    // Si on efface, on diminue l'index
-    else {
-        index--;
-        if (index < 0) {
-            sens = 1; // recommencer à écrire
-        }
-    }
-
-    setTimeout(ecrireTitre, 500); // vitesse d'écriture/effacement
+    document.title = titre.slice(0,index);
+    if(sens===1){ index++; if(index>titre.length){ sens=-1; setTimeout(ecrireTitre,500); return; } } 
+    else { index--; if(index<0){ sens=1; } }
+    setTimeout(ecrireTitre,500);
 }
-
-// Lancer l'animation dès le chargement
 window.addEventListener('load', ecrireTitre);
-</script>
-<script>
-// Récupère le compteur actuel dans localStorage
-let visites = localStorage.getItem('visites');
-if (!visites) visites = 0;
 
-// Incrémente le compteur
-visites++;
-localStorage.setItem('visites', visites);
+// -------------------
+// Compteur global Supabase
+// -------------------
+const SUPABASE_URL = "https://YOUR_PROJECT_URL.supabase.co"; // Remplace par ton URL Supabase
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY"; // Remplace par ta clé anonyme
 
-// Affiche le compteur dans l'élément
-document.getElementById('compteur').textContent = visites;
-</script>
+const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<script>
 async function incrementerCompteur() {
-    // Lire le compteur depuis le serveur
-    let response = await fetch('./visites.json');
-    let data = await response.json();
+    // Récupérer le compteur
+    let { data, error } = await supabase.from('visites').select('compteur').eq('id',1).single();
+    if(error){ console.error(error); return; }
 
-    // Incrémenter
-    data.compteur++;
+    let compteur = data.compteur + 1;
 
-    // Afficher dans la page
-    document.getElementById('compteur').textContent = data.compteur;
+    // Mettre à jour le compteur
+    const { error:updateError } = await supabase.from('visites').update({ compteur }).eq('id',1);
+    if(updateError){ console.error(updateError); return; }
 
-    // Envoyer le compteur mis à jour au serveur
-    await fetch('./update_visites.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data)
-    });
+    // Afficher dans le site
+    document.getElementById('compteur').textContent = compteur;
 }
 
-// Lancer à chaque visite
 incrementerCompteur();
 </script>
+
 </body>
 </html>
-
