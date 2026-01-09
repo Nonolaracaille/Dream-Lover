@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dreamlover</title>
+<link rel="icon" href="./image.png" type="image/png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Cinzel', serif;
+    overflow: hidden;
+}
+
+/* VIDEO DE FOND */
+#bgVideo {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -1;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+}
+
+/* OVERLAY SANS BLUR */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, rgba(0,0,0,0.4), rgba(0,0,0,0.9));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* CARD */
+.card {
+    text-align: center;
+    color: white;
+    animation: fadeIn 2s ease;
+}
+
+/* AVATAR */
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.4);
+    margin-bottom: 15px;
+}
+
+/* TEXT */
+h1 {
+    margin: 0;
+    font-size: 36px;
+    letter-spacing: 2px;
+}
+
+.quote {
+    margin-top: 8px;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.location {
+    margin-top: 8px;
+    font-size: 13px;
+    opacity: 0.5;
+}
+
+/* ICONS */
+.icons {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+}
+
+.icons a {
+    color: white;
+    font-size: 22px;
+    opacity: 0.8;
+    transition: 0.3s;
+}
+
+.icons a:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* ANIM */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+<!-- ICONS -->
+<script src="https://kit.fontawesome.com/7b2c1d4c8f.js" crossorigin="anonymous"></script>
+
+</head>
+<body>
+
+<!-- VIDEO DE FOND (SON NON MUTE) -->
+<video autoplay loop id="bgVideo">
+    <source src="./video.mp4" type="video/mp4">
+    Votre navigateur ne supporte pas la vidéo.
+</video>
+
+<div class="overlay">
+    <div class="card">
+
+        <img src="./avatar.jpeg" class="avatar" alt="avatar">
+
+        <h1>Dream Lover</h1>
+
+        <div class="quote">
+            Let others criticize you, but don’t do it for them.
+        </div>
+
+        <div class="location">
+            📍 France
+        </div>
+        <!-- Compteur de visites avec image sous la localisation -->
+<div id="visites" style="margin-top:8px; display:flex; align-items:center; gap:5px; justify-content:center; color:white; font-size:18px;">
+    <img src="./eye.jpeg" alt="oeil" style="width:20px; height:20px;">
+    <span id="compteur">0</span>
+</div>
+
+        <div class="icons">
+            <a href="#" target="_blank"><i class="fab fa-snapchat-ghost"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
+        </div>
+
+    </div>
+</div>
+
+<!-- JS pour lancer le son au clic -->
+<script>
+document.addEventListener('click', () => {
+    const video = document.getElementById('bgVideo');
+    video.play();
+}, { once: true });
+</script>
+
+<!-- JS pour titre qui s'écrit en boucle dans l'onglet -->
+<script>
+const titre = "@Dream Lover"; // texte à afficher
+let index = 0;
+let sens = 1; // 1 = écrire, -1 = effacer
+
+function ecrireTitre() {
+    document.title = titre.slice(0, index);
+
+    // Si on écrit, on augmente l'index
+    if (sens === 1) {
+        index++;
+        if (index > titre.length) {
+            sens = -1; // commencer à effacer
+            setTimeout(ecrireTitre, 1000); // pause 1s à la fin
+            return;
+        }
+    } 
+    // Si on efface, on diminue l'index
+    else {
+        index--;
+        if (index < 0) {
+            sens = 1; // recommencer à écrire
+        }
+    }
+
+    setTimeout(ecrireTitre, 500); // vitesse d'écriture/effacement
+}
+
+// Lancer l'animation dès le chargement
+window.addEventListener('load', ecrireTitre);
+</script>
+<script>
+// Récupère le compteur actuel dans localStorage
+let visites = localStorage.getItem('visites');
+if (!visites) visites = 0;
+
+// Incrémente le compteur
+visites++;
+localStorage.setItem('visites', visites);
+
+// Affiche le compteur dans l'élément
+document.getElementById('compteur').textContent = visites;
+</script>
+
+<script>
+async function incrementerCompteur() {
+    // Lire le compteur depuis le serveur
+    let response = await fetch('./visites.json');
+    let data = await response.json();
+
+    // Incrémenter
+    data.compteur++;
+
+    // Afficher dans la page
+    document.getElementById('compteur').textContent = data.compteur;
+
+    // Envoyer le compteur mis à jour au serveur
+    await fetch('./update_visites.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+}
+
+// Lancer à chaque visite
+incrementerCompteur();
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="./image.png" type="image/png">
+<title>Enter</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background: url("background.jpg") center/cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+}
+
+#text {
+    position: relative;
+    z-index: 1;
+    color: white;
+    font-size: 32px;
+    letter-spacing: 2px;
+    font-family: Arial, sans-serif;
+}
+</style>
+</head>
+
+<body onclick="enter()">
+    <div id="text">Click to enter</div>
+
+<script>
+function enter() {
+    window.location.href = "Dream Lover1.html";
+}
+</script>
+<script>
+const titre = "@Dream Lover"; // texte à afficher
+let index = 0;
+let sens = 1; // 1 = écrire, -1 = effacer
+
+function ecrireTitre() {
+    document.title = titre.slice(0, index);
+
+    // Si on écrit, on augmente l'index
+    if (sens === 1) {
+        index++;
+        if (index > titre.length) {
+            sens = -1; // commencer à effacer
+            setTimeout(ecrireTitre, 1000); // pause 1s à la fin
+            return;
+        }
+    } 
+    // Si on efface, on diminue l'index
+    else {
+        index--;
+        if (index < 0) {
+            sens = 1; // recommencer à écrire
+        }
+    }
+
+    setTimeout(ecrireTitre, 500); // vitesse d'écriture/effacement
+}
+
+// Lancer l'animation dès le chargement
+window.addEventListener('load', ecrireTitre);
+</script>
+
+</body>
+</html>
